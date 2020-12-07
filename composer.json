@@ -1,0 +1,17 @@
+{
+  "name": "edata/finvoice-api",
+  "type": "library",
+  "description": "Finvoice API",
+  "require": {
+    "guzzlehttp/guzzle": "^7.2"
+  },
+  "authors": [
+    {
+      "name": "Abdulsamet Şahin",
+      "email": "abdulsametsah@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": { "EDATA\\": "src/" }
+  }
+}
