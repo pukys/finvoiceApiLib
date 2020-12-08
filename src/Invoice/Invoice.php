@@ -7,6 +7,7 @@ namespace EDATA\Invoice;
 use EDATA\Customer\Customer;
 use EDATA\FinvoiceAPI;
 use EDATA\Item\Item;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 
 class Invoice implements \JsonSerializable
@@ -932,5 +933,61 @@ class Invoice implements \JsonSerializable
     public function setFinvoiceApi($finvoiceApi): void
     {
         $this->finvoiceApi = $finvoiceApi;
+    }
+
+    /**
+     * @param array $invoice
+     * @param FinvoiceAPI $finvoiceAPI
+     * @return Invoice
+     * @throws Exception
+     */
+    public static function make(array $invoice, FinvoiceAPI $finvoiceAPI): Invoice
+    {
+        $invoice = new self($finvoiceAPI);
+
+        $invoice
+            ->setId($invoice['id'])
+            ->setType($invoice['type'])
+            ->setInvoiceDate($invoice['invoice_date'])
+            ->setDueDate($invoice['due_date'])
+            ->setInvoiceNumber($invoice['invoice_number'])
+            ->setReferenceNumber($invoice['reference_number'])
+            ->setStatus($invoice['status'])
+            ->setPaidStatus($invoice['paid_status'])
+            ->setTaxPerItem($invoice['tax_per_item'])
+            ->setDiscountPerItem($invoice['discount_per_item'])
+            ->setNotes($invoice['notes'])
+            ->setDiscountType($invoice['discount_type'])
+            ->setDiscount($invoice['discount'])
+            ->setDiscountVal($invoice['discount_val'])
+            ->setSubTotal($invoice['sub_total'])
+            ->setTotal($invoice['total'])
+            ->setTax($invoice['tax'])
+            ->setDueAmount($invoice['due_amount'])
+            ->setSent($invoice['sent'])
+            ->setViewed($invoice['viewed'])
+            ->setUniqueHash($invoice['unique_hash'])
+            ->setSerieId($invoice['serie_id'])
+            ->setInvoiceTemplateId($invoice['invoice_template_id'])
+            ->setCustomerId($invoice['customer_id'])
+            ->setCustomer($finvoiceAPI->getCustomers()->where('id', $invoice['customer_id'])->fetch()[0])
+            ->setAuthorId($invoice['author_id'])
+            ->setCompanyId($invoice['company_id'])
+            ->setCreatedAt($invoice['created_at'])
+            ->setUpdatedAt($invoice['updated_at'])
+            ->setViewedAt($invoice['viewed_at'])
+            ->setName($invoice['name'])
+            ->setFormattedInvoiceDate($invoice['formattedCreatedAt'])
+            ->setFormattedCreatedAt($invoice['formattedInvoiceDate'])
+            ->setFormattedDueDate($invoice['formattedDueDate'])
+            ->setPdfUrl($invoice['pdf_url'])
+            ->setInvoiceTemplate($invoice['invoice_template']);
+
+
+            foreach($invoice['items'] as $item) {
+                $invoice->addItem($finvoiceAPI->getItems()->where('id', $item['id'])->fetch()[0]);
+            }
+
+        return $invoice;
     }
 }
