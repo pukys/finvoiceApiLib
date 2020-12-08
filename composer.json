@@ -2,6 +2,7 @@
   "name": "edata/finvoice-api",
   "type": "library",
   "description": "Finvoice API",
+  "license": "MIT",
   "require": {
     "guzzlehttp/guzzle": "^6.3"
   },
