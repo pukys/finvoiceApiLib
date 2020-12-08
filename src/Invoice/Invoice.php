@@ -859,7 +859,7 @@ class Invoice implements \JsonSerializable
         return get_object_vars($this);
     }
 
-     /**
+    /**
      * @return array
      */
     public function toArray(): array
@@ -904,7 +904,9 @@ class Invoice implements \JsonSerializable
     public function send(?string $email = null): bool
     {
         try {
-            $emails = $email ? [$email] : array_map(function($e) {return $e->email;}, $this->getCustomer()->getEmails());
+            $emails = $email ? [$email] : array_map(function ($e) {
+                return $e->email;
+            }, $this->getCustomer()->getEmails());
 
             $response = $this->finvoiceApi->secureRequest('POST', "/invoices/send", [
                 'json' => [
@@ -914,7 +916,7 @@ class Invoice implements \JsonSerializable
             ]);
 
             return true;
-        }catch (GuzzleException $e) {
+        } catch (GuzzleException $e) {
             return false;
         }
     }
@@ -984,9 +986,13 @@ class Invoice implements \JsonSerializable
             ->setInvoiceTemplate($invoice['invoice_template']);
 
 
-            foreach($invoice['items'] as $item) {
-                $invoice->addItem($finvoiceAPI->getItems()->where('id', $item['id'])->fetch()[0]);
-            }
+        foreach ($invoice['items'] as $_item) {
+            $item = $finvoiceAPI->getItems()->where('id', $_item['id'])->fetch()[0]
+                ->setDiscount($_item['discount'])
+                ->setDiscountType($_item['discount_type'])
+                ->setDiscountVal($_item['discount_val']);
+            $invoice->addItem($item);
+        }
 
         return $invoice;
     }
