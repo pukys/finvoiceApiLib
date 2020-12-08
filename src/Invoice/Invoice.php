@@ -95,6 +95,9 @@ class Invoice implements \JsonSerializable
      * @var bool
      */
     private $viewed;
+    /**
+     * @var ?string
+     */
     private $unique_hash;
     /**
      * @var ?int
@@ -108,6 +111,10 @@ class Invoice implements \JsonSerializable
      * @var ?int
      */
     private $customer_id;
+    /**
+     * @var Customer $customer
+     */
+    private $customer;
     /**
      * @var ?int
      */
@@ -589,6 +596,14 @@ class Invoice implements \JsonSerializable
     }
 
     /**
+     * @return Customer
+     */
+    public function getCustomer(): Customer
+    {
+        return $this->customer;
+    }
+
+    /**
      * @param int|null $customer_id
      * @return Invoice
      */
@@ -605,6 +620,7 @@ class Invoice implements \JsonSerializable
     public function setCustomer(Customer $customer): Invoice
     {
         $this->setCustomerId($customer->getId());
+        $this->customer = $customer;
         return $this;
     }
 
@@ -866,19 +882,38 @@ class Invoice implements \JsonSerializable
     public function save(): bool
     {
         try {
-            print_r("----");
-            print_r(json_encode($this->toArray()));
-            print_r("----");
             $response = $this->finvoiceApi->secureRequest($this->getId() ? 'PUT' : 'POST', "/invoices" . ($this->getId() ? '/' . $this->getId() : null), [
                 'json' => $this->toArray(),
-                'debug' => true
             ]);
 
+            $content = json_decode($response->getBody()->getContents());
 
-
+            $this->setId($content->invoice->id);
             return true;
         } catch (GuzzleException $e) {
             $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);
+            return false;
+        }
+    }
+
+    /**
+     * @param string|null $email
+     * @return bool
+     */
+    public function send(?string $email = null): bool
+    {
+        try {
+            $emails = $email ? [$email] : array_map(function($e) {return $e->email;}, $this->getCustomer()->getEmails());
+
+            $response = $this->finvoiceApi->secureRequest('POST', "/invoices/send", [
+                'json' => [
+                    'id' => $this->getId(),
+                    'emails' => $emails
+                ],
+            ]);
+
+            return true;
+        }catch (GuzzleException $e) {
             return false;
         }
     }
