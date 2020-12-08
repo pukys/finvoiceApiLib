@@ -656,19 +656,20 @@ class Customer implements \JsonSerializable
 
     /**
      * @return bool
+     * @throws GuzzleException
      */
     public function save(): bool
     {
-        // todo: do this.. setCurrencyId
-
-        $this->setCurrencyId(1);
         try {
             $response = $this->finvoiceApi->secureRequest($this->getId() ? 'PUT' : 'POST', "/customers" . ($this->getId() ? '/' . $this->getId() : null), [
                 'json' => $this->toArray(),
             ]);
 
+            $content = json_decode($response->getBody()->getContents());
+
+            $this->setId($content->customer->id);
             return true;
-        } catch (GuzzleException $e) {
+        } catch (\Exception $e) {
             $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);
             return false;
         }
