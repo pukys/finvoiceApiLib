@@ -990,7 +990,7 @@ class Invoice implements \JsonSerializable
             $item = $finvoiceAPI->getItems()->where('id', $_item['id'])->fetch()[0]
                 ->setDiscount($_item['discount'])
                 ->setDiscountType($_item['discount_type'])
-                ->setDiscountVal($_item['discount_val']);
+                ->setDiscountVal($_item['discount']);
             $invoice->addItem($item);
         }
 
