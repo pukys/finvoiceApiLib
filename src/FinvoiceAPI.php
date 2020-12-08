@@ -50,8 +50,9 @@ class FinvoiceAPI
     /**
      * FinvoiceAPI constructor.
      * @param string $projectUrl
+     * @param string $apiKey
      */
-    public function __construct(string $projectUrl)
+    public function __construct(string $projectUrl, string $apiKey)
     {
         $this->setProjectUrl($projectUrl);
         $this->setHttpClient(new Client([
@@ -64,6 +65,7 @@ class FinvoiceAPI
         $this->setCustomers(new CustomerHelper($this));
         $this->setItems(new ItemHelper($this));
         $this->setInvoices(new InvoiceHelper($this));
+        $this->setApiKey($apiKey);
     }
 
     /**
@@ -113,30 +115,6 @@ class FinvoiceAPI
     public function setHttpClient(Client $httpClient)
     {
         $this->httpClient = $httpClient;
-    }
-
-
-    /**
-     * @param string $email
-     * @param string $password
-     * @return bool
-     * @throws GuzzleException
-     */
-    public function login(string $email, string $password): bool
-    {
-        $response = $this->getHttpClient()->request('POST', "/get-login-token", [
-            'json' => [
-                'email' => $email,
-                'password' => $password
-            ]
-        ]);
-
-        if ($response->getStatusCode() === 200) {
-            $this->setApiKey(json_decode($response->getBody()->getContents())->login_token);
-            return true;
-        }
-
-        return false;
     }
 
     /**
