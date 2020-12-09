@@ -125,6 +125,10 @@ class Customer implements JsonSerializable
      * @var ?array
      */
     private $media;
+    /**
+     * @var ?array
+     */
+    private $addresses;
 
     public function __construct(FinvoiceAPI $finvoiceAPI)
     {
@@ -636,6 +640,29 @@ class Customer implements JsonSerializable
     }
 
     /**
+     * @param int $index
+     * @return Address[]|Address|null
+     */
+    public function getAddresses(int $index = 0): ?iterable
+    {
+        if ($index > -1) {
+            return $this->addresses[$index];
+        }
+
+        return $this->addresses;
+    }
+
+    /**
+     * @param array|null $addresses
+     * @return Customer
+     */
+    public function setAddresses(?array $addresses): Customer
+    {
+        $this->addresses = $addresses;
+        return $this;
+    }
+
+    /**
      * @return array|mixed
      */
     public function jsonSerialize(): array
@@ -657,10 +684,9 @@ class Customer implements JsonSerializable
     }
 
     /**
-     * @return bool
-     * @throws GuzzleException
+     * @return bool|Customer
      */
-    public function save(): bool
+    public function save(): mixed
     {
         try {
             $response = $this->finvoiceApi->secureRequest($this->getId() ? 'PUT' : 'POST', "/customers" . ($this->getId() ? '/' . $this->getId() : null), [
@@ -670,8 +696,8 @@ class Customer implements JsonSerializable
             $content = json_decode($response->getBody()->getContents());
 
             $this->setId($content->customer->id);
-            return true;
-        } catch (Exception $e) {
+            return $this;
+        } catch (GuzzleException $e) {
             $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);
             return false;
         }
@@ -759,7 +785,10 @@ class Customer implements JsonSerializable
             ->setAvatar($data['avatar'] ?? '')
             ->setCurrency((array)$data['currency'] ?? [])
             ->setEmails((array)$data['emails'] ?? [])
-            ->setMedia((array)$data['media'] ?? []);
+            ->setMedia((array)$data['media'] ?? [])
+            ->setAddresses(array_map(function($address){
+                return Address::make((array) $address);
+            }, (array) $data['addresses']));
 
         return $customer;
 
