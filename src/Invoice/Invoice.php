@@ -9,8 +9,9 @@ use EDATA\FinvoiceAPI;
 use EDATA\Item\Item;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use JsonSerializable;
 
-class Invoice implements \JsonSerializable
+class Invoice implements JsonSerializable
 {
     /**
      * @var $finvoiceApi
@@ -402,7 +403,7 @@ class Invoice implements \JsonSerializable
      * @param float|int|string|null $discount
      * @return Invoice
      */
-    public function setDiscount($discount)
+    public function setDiscount($discount): Invoice
     {
         $this->discount = $discount;
         return $this;
@@ -420,7 +421,7 @@ class Invoice implements \JsonSerializable
      * @param float|int|string|null $discount_val
      * @return Invoice
      */
-    public function setDiscountVal($discount_val)
+    public function setDiscountVal($discount_val): Invoice
     {
         $this->discount_val = $discount_val;
         return $this;
@@ -438,7 +439,7 @@ class Invoice implements \JsonSerializable
      * @param float|int|string|null $sub_total
      * @return Invoice
      */
-    public function setSubTotal($sub_total)
+    public function setSubTotal($sub_total): Invoice
     {
         $this->sub_total = $sub_total;
         return $this;
@@ -456,7 +457,7 @@ class Invoice implements \JsonSerializable
      * @param float|int|string|null $total
      * @return Invoice
      */
-    public function setTotal($total)
+    public function setTotal($total): Invoice
     {
         $this->total = $total;
         return $this;
@@ -474,7 +475,7 @@ class Invoice implements \JsonSerializable
      * @param float|int|string|null $tax
      * @return Invoice
      */
-    public function setTax($tax)
+    public function setTax($tax): Invoice
     {
         $this->tax = $tax;
         return $this;
@@ -492,7 +493,7 @@ class Invoice implements \JsonSerializable
      * @param float|int|string|null $due_amount
      * @return Invoice
      */
-    public function setDueAmount($due_amount)
+    public function setDueAmount($due_amount): Invoice
     {
         $this->due_amount = $due_amount;
         return $this;
@@ -537,7 +538,7 @@ class Invoice implements \JsonSerializable
     /**
      * @return mixed
      */
-    public function getUniqueHash()
+    public function getUniqueHash(): ?string
     {
         return $this->unique_hash;
     }
@@ -546,7 +547,7 @@ class Invoice implements \JsonSerializable
      * @param mixed $unique_hash
      * @return Invoice
      */
-    public function setUniqueHash($unique_hash)
+    public function setUniqueHash($unique_hash): Invoice
     {
         $this->unique_hash = $unique_hash;
         return $this;
@@ -854,7 +855,7 @@ class Invoice implements \JsonSerializable
     /**
      * @return mixed
      */
-    public function getFinvoiceApi()
+    public function getFinvoiceApi(): FinvoiceAPI
     {
         return $this->finvoiceApi;
     }
@@ -924,7 +925,7 @@ class Invoice implements \JsonSerializable
                 return $e->email;
             }, $this->getCustomer()->getEmails());
 
-            $response = $this->finvoiceApi->secureRequest('POST', "/invoices/send", [
+            $this->finvoiceApi->secureRequest('POST', "/invoices/send", [
                 'json' => [
                     'id' => $this->getId(),
                     'emails' => $emails
@@ -947,7 +948,7 @@ class Invoice implements \JsonSerializable
     public function addPayment(string $payment_type, float $amount): bool
     {
         try {
-            $response = $this->finvoiceApi->secureRequest('POST', "/payments", [
+            $this->finvoiceApi->secureRequest('POST', "/payments", [
                 'json' => [
                     'invoice_id' => $this->getId(),
                     'customer_id' => $this->getCustomerId(),
@@ -970,9 +971,9 @@ class Invoice implements \JsonSerializable
      */
     public static function make(array $invoice, FinvoiceAPI $finvoiceAPI): Invoice
     {
-        $invoice = new self($finvoiceAPI);
+        $newInvoice = new self($finvoiceAPI);
 
-        $invoice
+        $newInvoice
             ->setId($invoice['id'])
             ->setType($invoice['type'])
             ->setInvoiceDate($invoice['invoice_date'])
@@ -1016,9 +1017,9 @@ class Invoice implements \JsonSerializable
                 ->setDiscount($_item['discount'])
                 ->setDiscountType($_item['discount_type'])
                 ->setDiscountVal($_item['discount']);
-            $invoice->addItem($item);
+            $newInvoice->addItem($item);
         }
 
-        return $invoice;
+        return $newInvoice;
     }
 }

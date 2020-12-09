@@ -4,7 +4,9 @@
 namespace EDATA\Item;
 
 
-class Item implements \JsonSerializable
+use JsonSerializable;
+
+class Item implements JsonSerializable
 {
     /**
      * @var ?int
@@ -137,7 +139,7 @@ class Item implements \JsonSerializable
      * @param float|int|string|null $price
      * @return Item
      */
-    public function setPrice($price)
+    public function setPrice($price): Item
     {
         $this->price = $price;
         return $this;
@@ -155,7 +157,7 @@ class Item implements \JsonSerializable
      * @param float|int|string|null $discount
      * @return Item
      */
-    public function setDiscount($discount)
+    public function setDiscount($discount): Item
     {
         $this->discount = $discount;
         return $this;

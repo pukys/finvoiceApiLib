@@ -3,9 +3,11 @@
 namespace EDATA\Customer;
 
 use EDATA\FinvoiceAPI;
+use Exception;
 use GuzzleHttp\Exception\GuzzleException;
+use JsonSerializable;
 
-class Customer implements \JsonSerializable
+class Customer implements JsonSerializable
 {
     /**
      * @var FinvoiceAPI
@@ -636,7 +638,7 @@ class Customer implements \JsonSerializable
     /**
      * @return array|mixed
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return get_object_vars($this);
     }
@@ -669,7 +671,7 @@ class Customer implements \JsonSerializable
 
             $this->setId($content->customer->id);
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);
             return false;
         }
@@ -682,7 +684,7 @@ class Customer implements \JsonSerializable
     {
         $this->setCurrencyId(1);
         try {
-            $response = $this->finvoiceApi->secureRequest("DELETE", "/customers/" . $this->getId(), []);
+            $this->finvoiceApi->secureRequest("DELETE", "/customers/" . $this->getId(), []);
 
             return true;
         } catch (GuzzleException $e) {
@@ -695,7 +697,7 @@ class Customer implements \JsonSerializable
      * @param string $email
      * @return $this
      */
-    public function addEmail(string $email)
+    public function addEmail(string $email): Customer
     {
         $this->emails[] = ['unique' => rand(0, 9999999999), 'text' => $email];
         return $this;
@@ -705,7 +707,7 @@ class Customer implements \JsonSerializable
      * @param string $email
      * @return $this
      */
-    public function removeEmail(string $email)
+    public function removeEmail(string $email): Customer
     {
         $tmp = [];
 
