@@ -852,6 +852,22 @@ class Invoice implements \JsonSerializable
     }
 
     /**
+     * @return mixed
+     */
+    public function getFinvoiceApi()
+    {
+        return $this->finvoiceApi;
+    }
+
+    /**
+     * @param mixed $finvoiceApi
+     */
+    public function setFinvoiceApi($finvoiceApi): void
+    {
+        $this->finvoiceApi = $finvoiceApi;
+    }
+
+    /**
      * @return array
      */
     public function jsonSerialize(): array
@@ -917,24 +933,33 @@ class Invoice implements \JsonSerializable
 
             return true;
         } catch (GuzzleException $e) {
+            $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);
             return false;
         }
     }
 
-    /**
-     * @return mixed
-     */
-    public function getFinvoiceApi()
-    {
-        return $this->finvoiceApi;
-    }
 
     /**
-     * @param mixed $finvoiceApi
+     * @param string $payment_type
+     * @param float $amount
+     * @return bool
      */
-    public function setFinvoiceApi($finvoiceApi): void
+    public function addPayment(string $payment_type, float $amount): bool
     {
-        $this->finvoiceApi = $finvoiceApi;
+        try {
+            $response = $this->finvoiceApi->secureRequest('POST', "/payments", [
+                'json' => [
+                    'invoice_id' => $this->getId(),
+                    'customer_id' => $this->getCustomerId(),
+                    'payment_type_title' => $payment_type,
+                    'amount' => $amount
+                ],
+            ]);
+            return true;
+        } catch (GuzzleException $e) {
+            $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);
+            return false;
+        }
     }
 
     /**
