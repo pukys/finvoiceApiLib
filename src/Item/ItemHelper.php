@@ -34,11 +34,6 @@ class ItemHelper {
      */
     public function where($key, $value): ItemHelper
     {
-        $validKeys = ['id', 'name'];
-        if (!in_array($key, $validKeys)) {
-            throw new Exception("$key is not valid. Valid keys are " . join(",", $validKeys));
-        }
-
         $this->where[$key] = $value;
         return $this;
     }

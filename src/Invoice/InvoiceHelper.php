@@ -52,11 +52,6 @@ class InvoiceHelper
      */
     public function where($key, $value): InvoiceHelper
     {
-        $validKeys = ['id', 'type', 'customer_id'];
-        if (!in_array($key, $validKeys)) {
-            throw new Exception("$key is not valid. Valid keys are " . join(",", $validKeys));
-        }
-
         $this->where[$key] = $value;
         return $this;
     }
