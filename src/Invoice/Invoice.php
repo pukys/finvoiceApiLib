@@ -1027,7 +1027,7 @@ class Invoice implements JsonSerializable
 
 
         foreach ($invoice['items'] as $_item) {
-            $item = $finvoiceAPI->getItems()->where('id', $_item['id'])->fetch()[0]
+            $item = $finvoiceAPI->getItems()->where('id', $_item['item_id'])->fetch()[0]
                 ->setDiscount($_item['discount'])
                 ->setDiscountType($_item['discount_type'])
                 ->setDiscountVal($_item['discount']);
