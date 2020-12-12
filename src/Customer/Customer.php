@@ -684,9 +684,9 @@ class Customer implements JsonSerializable
     }
 
     /**
-     * @return bool|Customer
+     * @return Customer
      */
-    public function save(): mixed
+    public function save(): Customer
     {
         try {
             $response = $this->finvoiceApi->secureRequest($this->getId() ? 'PUT' : 'POST', "/customers" . ($this->getId() ? '/' . $this->getId() : null), [
@@ -699,7 +699,7 @@ class Customer implements JsonSerializable
             return $this;
         } catch (GuzzleException $e) {
             $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);
-            return false;
+            return $this;
         }
     }
 
@@ -786,11 +786,10 @@ class Customer implements JsonSerializable
             ->setCurrency((array)$data['currency'] ?? [])
             ->setEmails((array)$data['emails'] ?? [])
             ->setMedia((array)$data['media'] ?? [])
-            ->setAddresses(array_map(function($address){
+            ->setAddresses(array_map(function ($address) {
                 return Address::make((array) $address);
             }, (array) $data['addresses']));
 
         return $customer;
-
     }
 }
