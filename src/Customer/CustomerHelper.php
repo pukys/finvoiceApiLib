@@ -74,7 +74,7 @@ class CustomerHelper
             return null;
         }
 
-        $customers = json_decode($response->getBody()->getContents())->customers;
+        $customers = json_decode($response->getBody()->getContents(), true)['customers'];
 
         return array_map(function ($customer) {
             return Customer::make((array) $customer, $this->finvoiceAPI);
