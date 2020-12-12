@@ -34,7 +34,7 @@ class Invoice implements JsonSerializable
      */
     private $due_date;
     /**
-     * @var ?int
+     * @var ?string
      */
     private $invoice_number;
     /**
@@ -248,18 +248,18 @@ class Invoice implements JsonSerializable
     }
 
     /**
-     * @return int|null
+     * @return string|null
      */
-    public function getInvoiceNumber(): ?int
+    public function getInvoiceNumber(): ?string
     {
         return $this->invoice_number;
     }
 
     /**
-     * @param int|null $invoice_number
+     * @param string|null $invoice_number
      * @return Invoice
      */
-    public function setInvoiceNumber(?int $invoice_number): Invoice
+    public function setInvoiceNumber(?string $invoice_number): Invoice
     {
         $this->invoice_number = $invoice_number;
         return $this;
@@ -906,7 +906,21 @@ class Invoice implements JsonSerializable
 
             $content = json_decode($response->getBody()->getContents());
 
-            $this->setId($content->invoice->id);
+            $this
+                ->setId($content->invoice->id)
+                ->setTotal($content->invoice->total)
+                ->setInvoiceNumber($content->invoice->invoice_number)
+                ->setSubTotal($content->invoice->sub_total)
+                ->setDueAmount($content->invoice->due_amount)
+                ->setCreatedAt($content->invoice->created_at)
+                ->setUpdatedAt($content->invoice->updated_at)
+                ->setViewedAt($content->invoice->viewed_at)
+                ->setFormattedCreatedAt($content->invoice->formattedCreatedAt)
+                ->setFormattedInvoiceDate($content->invoice->formattedInvoiceDate)
+                ->setFormattedDueDate($content->invoice->formattedDueDate)
+                ->setPdfUrl($content->invoice->pdf_url)
+                ->setAuthorId($content->invoice->author_id);
+
             return true;
         } catch (GuzzleException $e) {
             $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);

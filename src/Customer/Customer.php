@@ -641,14 +641,10 @@ class Customer implements JsonSerializable
 
     /**
      * @param int $index
-     * @return Address[]|Address|null
+     * @return Address[]
      */
-    public function getAddresses(int $index = 0): ?iterable
+    public function getAddresses(): iterable
     {
-        if ($index > -1) {
-            return $this->addresses[$index];
-        }
-
         return $this->addresses;
     }
 
