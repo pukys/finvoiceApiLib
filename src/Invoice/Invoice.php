@@ -14,7 +14,7 @@ use JsonSerializable;
 class Invoice implements JsonSerializable
 {
     /**
-     * @var $finvoiceApi
+     * @var ?FinvoiceApi
      */
     private $finvoiceApi;
     /**
@@ -853,7 +853,7 @@ class Invoice implements JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return FinvoiceAPI
      */
     public function getFinvoiceApi(): FinvoiceAPI
     {
