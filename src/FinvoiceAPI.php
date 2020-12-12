@@ -147,6 +147,12 @@ class FinvoiceAPI
     {
         $url = "api" . $url . "?login_token=" . $this->getApiKey();
 
+        if ($method == "GET" && isset($data['json'])) {
+            foreach ($data['json'] as $key => $val) {
+                $url .= "&$key=$val";
+            }
+        }
+
         return $this->getHttpClient()->request($method, $url, $data);
     }
 
