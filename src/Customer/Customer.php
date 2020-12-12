@@ -58,7 +58,7 @@ class Customer implements JsonSerializable
      */
     private $type;
     /**
-     * @var ?integer
+     * @var ?string
      */
     private $company_code;
     /**
@@ -334,18 +334,18 @@ class Customer implements JsonSerializable
     }
 
     /**
-     * @return ?int
+     * @return ?string
      */
-    public function getCompanyCode(): ?int
+    public function getCompanyCode(): ?string
     {
         return $this->company_code;
     }
 
     /**
-     * @param ?int $company_code
+     * @param ?string $company_code
      * @return Customer
      */
-    public function setCompanyCode(?int $company_code): Customer
+    public function setCompanyCode(?string $company_code): Customer
     {
         $this->company_code = $company_code;
         return $this;
