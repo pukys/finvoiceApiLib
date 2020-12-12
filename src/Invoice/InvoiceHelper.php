@@ -63,7 +63,7 @@ class InvoiceHelper
     public function fetch(): ?iterable
     {
         try {
-            $response = $this->getFinvoiceApi()->secureRequest('GET', '/customers', [
+            $response = $this->getFinvoiceApi()->secureRequest('GET', '/invoices', [
                 'json' => array_merge(['limit' => -1], $this->where)
             ]);
         } catch (GuzzleException $e) {
@@ -71,7 +71,7 @@ class InvoiceHelper
             return null;
         }
 
-        $invoices = json_decode($response->getBody()->getContents(), true)->invoices;
+        $invoices = json_decode($response->getBody()->getContents(), true)['invoices'];
 
         return array_map(function ($invoice) {
             return Invoice::make((array) $invoice, $this->getFinvoiceApi());
