@@ -65,7 +65,7 @@ class Item implements JsonSerializable
      */
     private $formattedCreatedAt;
     /**
-     * @var ?string
+     * @var ?array
      */
     private $unit;
     /**
@@ -290,18 +290,18 @@ class Item implements JsonSerializable
     }
 
     /**
-     * @return string|null
+     * @return array|null
      */
-    public function getUnit(): ?string
+    public function getUnit(): ?array
     {
         return $this->unit;
     }
 
     /**
-     * @param string|null $unit
+     * @param array|null $unit
      * @return Item
      */
-    public function setUnit(?string $unit): Item
+    public function setUnit(?array $unit): Item
     {
         $this->unit = $unit;
         return $this;
