@@ -8,7 +8,6 @@ use EDATA\Customer\Customer;
 use EDATA\FinvoiceAPI;
 use EDATA\Item\Item;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 use JsonSerializable;
 
 class Invoice implements JsonSerializable

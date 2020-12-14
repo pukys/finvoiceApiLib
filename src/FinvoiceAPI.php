@@ -142,7 +142,7 @@ class FinvoiceAPI
 
         if ($code >= 300) {
             $this->setErrorInfo(['body' => $body]);
-            throw new Exception("Couldn't make request. - $method $url ::::::::: " . serialize($data) ."\r\r". $response);
+            throw new Exception("Couldn't make request. - $method $url ::::::::: " . json_encode($data) ."\r\r". $response);
         }
 
         return json_decode($body, true);

@@ -4,7 +4,6 @@ namespace EDATA\Item;
 
 use EDATA\FinvoiceAPI;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 
 class ItemHelper
 {

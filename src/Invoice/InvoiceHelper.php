@@ -6,7 +6,6 @@ namespace EDATA\Invoice;
 
 use EDATA\FinvoiceAPI;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 
 class InvoiceHelper
 {

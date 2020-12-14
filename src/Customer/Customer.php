@@ -4,7 +4,6 @@ namespace EDATA\Customer;
 
 use EDATA\FinvoiceAPI;
 use Exception;
-use GuzzleHttp\Exception\GuzzleException;
 use JsonSerializable;
 
 class Customer implements JsonSerializable
@@ -640,7 +639,6 @@ class Customer implements JsonSerializable
     }
 
     /**
-     * @param int $index
      * @return Address[]
      */
     public function getAddresses(): iterable
@@ -681,22 +679,13 @@ class Customer implements JsonSerializable
 
     /**
      * @return Customer
+     * @throws Exception
      */
     public function save(): Customer
     {
-        try {
-            $response = $this->finvoiceApi->secureRequest($this->getId() ? 'PUT' : 'POST', "/customers" . ($this->getId() ? '/' . $this->getId() : null), [
-                'json' => $this->toArray(),
-            ]);
-
-            $content = json_decode($response->getBody()->getContents());
-
-            $this->setId($content->customer->id);
-            return $this;
-        } catch (GuzzleException $e) {
-            $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);
-            return $this;
-        }
+        $response = $this->finvoiceApi->secureRequest($this->getId() ? 'PUT' : 'POST', "/customers" . ($this->getId() ? '/' . $this->getId() : null), $this->toArray());
+        $this->setId($response['customer']['id']);
+        return $this;
     }
 
     /**
@@ -706,6 +695,7 @@ class Customer implements JsonSerializable
     public function delete(): bool
     {
         $this->finvoiceApi->secureRequest("DELETE", "/customers/" . $this->getId(), []);
+        return true;
     }
 
     /**
@@ -776,8 +766,8 @@ class Customer implements JsonSerializable
             ->setEmails((array)$data['emails'] ?? [])
             ->setMedia((array)$data['media'] ?? [])
             ->setAddresses(array_map(function ($address) {
-                return Address::make((array) $address);
-            }, (array) $data['addresses']));
+                return Address::make((array)$address);
+            }, (array)$data['addresses']));
 
         return $customer;
     }

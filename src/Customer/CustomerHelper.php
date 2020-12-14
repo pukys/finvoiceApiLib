@@ -5,7 +5,6 @@ namespace EDATA\Customer;
 
 
 use EDATA\FinvoiceAPI;
-use GuzzleHttp\Exception\GuzzleException;
 
 class CustomerHelper
 {
@@ -67,7 +66,6 @@ class CustomerHelper
     public function fetch(): ?iterable
     {
         $response = $this->finvoiceAPI->secureRequest('GET', '/customers', array_merge(['limit' => -1], $this->where));
-
         $customers = $response['customers'];
 
         return array_map(function ($customer) {
