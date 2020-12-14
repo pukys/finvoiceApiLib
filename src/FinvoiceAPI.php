@@ -6,6 +6,7 @@ use EDATA\Customer\Customer;
 use EDATA\Customer\CustomerHelper;
 use EDATA\Invoice\InvoiceHelper;
 use EDATA\Item\ItemHelper;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
@@ -26,11 +27,6 @@ class FinvoiceAPI
      * @var string
      */
     private $apiKey = '';
-
-    /**
-     * @var Client
-     */
-    private $httpClient;
 
     /**
      * @var CustomerHelper
@@ -54,18 +50,11 @@ class FinvoiceAPI
      */
     public function __construct(string $projectUrl, string $apiKey)
     {
-        $this->setProjectUrl($projectUrl);
-        $this->setHttpClient(new Client([
-            'base_uri' => $projectUrl,
-            'headers' => [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-            ]
-        ]));
-        $this->setCustomers(new CustomerHelper($this));
+        $this->projectUrl = $projectUrl;
+        $this->apiKey = $apiKey;
+        $this->customers = new CustomerHelper($this);
         $this->setItems(new ItemHelper($this));
         $this->setInvoices(new InvoiceHelper($this));
-        $this->setApiKey($apiKey);
     }
 
     /**
@@ -102,22 +91,6 @@ class FinvoiceAPI
     }
 
     /**
-     * @return Client
-     */
-    public function getHttpClient(): Client
-    {
-        return $this->httpClient;
-    }
-
-    /**
-     * @param Client $httpClient
-     */
-    public function setHttpClient(Client $httpClient)
-    {
-        $this->httpClient = $httpClient;
-    }
-
-    /**
      * @return CustomerHelper
      */
     public function getCustomers(): CustomerHelper
@@ -140,20 +113,39 @@ class FinvoiceAPI
      * @param string $method
      * @param string $url
      * @param array $data
-     * @return ResponseInterface
-     * @throws GuzzleException
+     * @return array
+     * @throws Exception
      */
-    public function secureRequest(string $method, string $url, array $data)
+    public function secureRequest(string $method, string $url, array $data): array
     {
-        $url = "api" . $url . "?login_token=" . $this->getApiKey();
-
-        if ($method == "GET" && isset($data['json'])) {
-            foreach ($data['json'] as $key => $val) {
-                $url .= "&$key=$val";
-            }
+        $url = $this->getProjectUrl() . "/api" . $url . "?login_token=" . $this->getApiKey();
+        if ($method == "GET") {
+            $query = http_build_query($data);
+            $url = $url . "&" . $query;
         }
 
-        return $this->getHttpClient()->request($method, $url, $data);
+        $ch = curl_init($url);
+        $payload = json_encode($data);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type:application/json',
+            'Accept:application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        $response = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $body = substr($response, $header_size);
+        curl_close($ch);
+
+        if ($code >= 300) {
+            $this->setErrorInfo(['body' => $body]);
+            throw new Exception("Couldn't make request. - $method $url ::::::::: " . serialize($data) ."\r\r". $response);
+        }
+
+        return json_decode($body, true);
     }
 
     /**

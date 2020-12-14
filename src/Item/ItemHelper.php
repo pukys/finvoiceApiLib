@@ -6,7 +6,8 @@ use EDATA\FinvoiceAPI;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 
-class ItemHelper {
+class ItemHelper
+{
     /**
      * @var FinvoiceAPI
      */
@@ -40,22 +41,14 @@ class ItemHelper {
 
     /**
      * @return ?Item[]
+     * @throws Exception
      */
     public function fetch(): ?iterable
     {
-        try {
-            $response = $this->finvoiceAPI->secureRequest('GET', '/items', [
-                'json' => array_merge(['limit' => -1], $this->where)
-            ]);
-        } catch (GuzzleException $e) {
-            $this->finvoiceAPI->setErrorInfo(['message' => $e->getMessage()]);
-            return null;
-        }
+        $response = $this->finvoiceAPI->secureRequest('GET', '/items', array_merge(['limit' => -1], $this->where));
 
-        $data = json_decode($response->getBody()->getContents(), true);
-
-        $items = $data['items'];
-        $this->setTaxes($data['taxTypes']);
+        $items = $response['items'];
+        $this->setTaxes($response['taxTypes']);
 
         return array_map(function ($item) {
             return Item::make((array) $item);

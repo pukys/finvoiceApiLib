@@ -66,7 +66,7 @@ class Customer implements JsonSerializable
      */
     private $language;
     /**
-     * @var ?integer
+     * @var ?string
      */
     private $vat_code;
     /**
@@ -370,18 +370,18 @@ class Customer implements JsonSerializable
     }
 
     /**
-     * @return ?int
+     * @return ?string
      */
-    public function getVatCode(): ?int
+    public function getVatCode(): ?string
     {
         return $this->vat_code;
     }
 
     /**
-     * @param ?int $vat_code
+     * @param ?string $vat_code
      * @return Customer
      */
-    public function setVatCode(?int $vat_code): Customer
+    public function setVatCode(?string $vat_code): Customer
     {
         $this->vat_code = $vat_code;
         return $this;
@@ -701,18 +701,11 @@ class Customer implements JsonSerializable
 
     /**
      * @return bool
+     * @throws Exception
      */
     public function delete(): bool
     {
-        $this->setCurrencyId(1);
-        try {
-            $this->finvoiceApi->secureRequest("DELETE", "/customers/" . $this->getId(), []);
-
-            return true;
-        } catch (GuzzleException $e) {
-            $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);
-            return false;
-        }
+        $this->finvoiceApi->secureRequest("DELETE", "/customers/" . $this->getId(), []);
     }
 
     /**

@@ -363,6 +363,7 @@ class Item implements JsonSerializable
             ->setDescription($data['description'])
             ->setPrice($data['price'])
             ->setType($data['type'])
+            ->setQuantity($data['quantity'] ?? 1)
             ->setCompanyId($data['company_id'])
             ->setUnitId($data['unit_id'])
             ->setCreatedAt($data['created_at'])

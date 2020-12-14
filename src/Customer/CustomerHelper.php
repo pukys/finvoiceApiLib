@@ -62,22 +62,16 @@ class CustomerHelper
 
     /**
      * @return ?Customer[]
+     * @throws \Exception
      */
     public function fetch(): ?iterable
     {
-        try {
-            $response = $this->finvoiceAPI->secureRequest('GET', '/customers', [
-                'json' => array_merge(['limit' => -1], $this->where)
-            ]);
-        } catch (GuzzleException $e) {
-            $this->finvoiceAPI->setErrorInfo(['message' => $e->getMessage()]);
-            return null;
-        }
+        $response = $this->finvoiceAPI->secureRequest('GET', '/customers', array_merge(['limit' => -1], $this->where));
 
-        $customers = json_decode($response->getBody()->getContents(), true)['customers'];
+        $customers = $response['customers'];
 
         return array_map(function ($customer) {
-            return Customer::make((array) $customer, $this->finvoiceAPI);
+            return Customer::make((array)$customer, $this->finvoiceAPI);
         }, $customers);
     }
 }

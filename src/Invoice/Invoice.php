@@ -896,61 +896,47 @@ class Invoice implements JsonSerializable
 
     /**
      * @return bool
+     * @throws Exception
      */
     public function save(): bool
     {
-        try {
-            $response = $this->finvoiceApi->secureRequest($this->getId() ? 'PUT' : 'POST', "/invoices" . ($this->getId() ? '/' . $this->getId() : null), [
-                'json' => $this->toArray(),
-            ]);
+        $response = $this->finvoiceApi->secureRequest($this->getId() ? 'PUT' : 'POST', "/invoices" . ($this->getId() ? '/' . $this->getId() : null), $this->toArray());
 
-            $content = json_decode($response->getBody()->getContents());
+        $this
+            ->setId($response['invoice']['id'])
+            ->setTotal($response['invoice']['total'])
+            ->setInvoiceNumber($response['invoice']['invoice_number'])
+            ->setSubTotal($response['invoice']['sub_total'])
+            ->setDueAmount($response['invoice']['due_amount'])
+            ->setCreatedAt($response['invoice']['created_at'])
+            ->setUpdatedAt($response['invoice']['updated_at'])
+            ->setViewedAt($response['invoice']['viewed_at'])
+            ->setFormattedCreatedAt($response['invoice']['formattedCreatedAt'])
+            ->setFormattedInvoiceDate($response['invoice']['formattedInvoiceDate'])
+            ->setFormattedDueDate($response['invoice']['formattedDueDate'])
+            ->setPdfUrl($response['invoice']['pdf_url'])
+            ->setAuthorId($response['invoice']['author_id']);
 
-            $this
-                ->setId($content->invoice->id)
-                ->setTotal($content->invoice->total)
-                ->setInvoiceNumber($content->invoice->invoice_number)
-                ->setSubTotal($content->invoice->sub_total)
-                ->setDueAmount($content->invoice->due_amount)
-                ->setCreatedAt($content->invoice->created_at)
-                ->setUpdatedAt($content->invoice->updated_at)
-                ->setViewedAt($content->invoice->viewed_at)
-                ->setFormattedCreatedAt($content->invoice->formattedCreatedAt)
-                ->setFormattedInvoiceDate($content->invoice->formattedInvoiceDate)
-                ->setFormattedDueDate($content->invoice->formattedDueDate)
-                ->setPdfUrl($content->invoice->pdf_url)
-                ->setAuthorId($content->invoice->author_id);
-
-            return true;
-        } catch (GuzzleException $e) {
-            $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);
-            return false;
-        }
+        return true;
     }
 
     /**
      * @param string|null $email
      * @return bool
+     * @throws Exception
      */
     public function send(?string $email = null): bool
     {
-        try {
-            $emails = $email ? [$email] : array_map(function ($e) {
-                return $e->email;
-            }, $this->getCustomer()->getEmails());
+        $emails = $email ? [$email] : array_map(function ($e) {
+            return $e->email;
+        }, $this->getCustomer()->getEmails());
 
-            $this->finvoiceApi->secureRequest('POST', "/invoices/send", [
-                'json' => [
-                    'id' => $this->getId(),
-                    'emails' => $emails
-                ],
-            ]);
+        $this->finvoiceApi->secureRequest('POST', "/invoices/send", [
+            'id' => $this->getId(),
+            'emails' => $emails
+        ]);
 
-            return true;
-        } catch (GuzzleException $e) {
-            $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);
-            return false;
-        }
+        return true;
     }
 
 
@@ -958,23 +944,17 @@ class Invoice implements JsonSerializable
      * @param string $payment_type
      * @param float $amount
      * @return bool
+     * @throws Exception
      */
     public function addPayment(string $payment_type, float $amount): bool
     {
-        try {
-            $this->finvoiceApi->secureRequest('POST', "/payments", [
-                'json' => [
-                    'invoice_id' => $this->getId(),
-                    'customer_id' => $this->getCustomerId(),
-                    'payment_type_title' => $payment_type,
-                    'amount' => $amount
-                ],
-            ]);
-            return true;
-        } catch (GuzzleException $e) {
-            $this->finvoiceApi->setErrorInfo(['message' => $e->getMessage()]);
-            return false;
-        }
+        $this->finvoiceApi->secureRequest('POST', "/payments", [
+            'invoice_id' => $this->getId(),
+            'customer_id' => $this->getCustomerId(),
+            'payment_type_title' => $payment_type,
+            'amount' => $amount
+        ]);
+        return true;
     }
 
     /**

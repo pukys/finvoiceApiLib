@@ -62,20 +62,11 @@ class InvoiceHelper
      */
     public function fetch(): ?iterable
     {
-        try {
-            $response = $this->getFinvoiceApi()->secureRequest('GET', '/invoices', [
-                'json' => array_merge(['limit' => -1], $this->where)
-            ]);
-        } catch (GuzzleException $e) {
-            $this->getFinvoiceApi()->setErrorInfo(['message' => $e->getMessage()]);
-            return null;
-        }
-
-        $invoices = json_decode($response->getBody()->getContents(), true)['invoices'];
+        $response = $this->getFinvoiceApi()->secureRequest('GET', '/invoices', array_merge(['limit' => -1], $this->where));
 
         return array_map(function ($invoice) {
-            return Invoice::make((array) $invoice, $this->getFinvoiceApi());
-        }, $invoices);
+            return Invoice::make((array)$invoice, $this->getFinvoiceApi());
+        }, $response['invoices']);
     }
 
     /**
