@@ -927,7 +927,7 @@ class Invoice implements JsonSerializable
     public function send(?string $email = null): bool
     {
         $emails = $email ? [$email] : array_map(function ($e) {
-            return $e->email;
+            return $e['email'];
         }, $this->getCustomer()->getEmails());
 
         $this->finvoiceApi->secureRequest('POST', "/invoices/send", [
