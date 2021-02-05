@@ -953,13 +953,14 @@ class Invoice implements JsonSerializable
      * @return bool
      * @throws Exception
      */
-    public function addPayment(string $payment_type, float $amount): bool
+    public function addPayment(string $payment_type, float $amount, bool $taxIncluded = false): bool
     {
         $this->finvoiceApi->secureRequest('POST', "/payments", [
             'invoice_id' => $this->getId(),
             'customer_id' => $this->getCustomerId(),
             'payment_type_title' => $payment_type,
-            'amount' => $amount
+            'amount' => $amount,
+            'tax_included' => $taxIncluded
         ]);
         return true;
     }
