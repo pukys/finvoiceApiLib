@@ -72,6 +72,11 @@ class Item implements JsonSerializable
      * @var int[]
      */
     private $taxes;
+    
+    /**
+     * @var bool
+     */
+    private $taxIncluded;
 
     /**
      * @return int|null
@@ -405,6 +410,24 @@ class Item implements JsonSerializable
     public function setDiscountVal($discount_val): Item
     {
         $this->discount_val = $discount_val;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getTaxIncluded(): bool
+    {
+        return $this->taxIncluded;
+    }
+
+    /**
+     * @param bool
+     * @return Item
+     */
+    public function setTaxIncluded($taxIncluded): Item
+    {
+        $this->taxIncluded = $taxIncluded;
         return $this;
     }
 }
